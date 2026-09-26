@@ -31,7 +31,7 @@ main:
 		
 		incq %rcx
 
-		# calling sqroot here, return value in rax
+		# calling sqroot here, return value in xmm0
 		pushq %r8
 		pushq %r9
 		pushq %rcx

@@ -3,38 +3,44 @@
 .section .rodata
 	.align 16
 	abs_mask: .quad 0x7fffffffffffffff, 0xffffffffffffffff
+	neg_nan: .quad 0xfff8000000000000
+	zero: .double 0.0
+	one: .double 1.0
 
 .section .text
 
 .global sqroot
 
+# @brief: 	This function approximates sqroots
+# 			It starts off with 1, and it checks if the value squared is more than
+#			or equals to the value we expect. If not, it will increment by 1 every loop iteration.
+#			Although the result is in a floating-type, the decimals are always 0.
 sqroot:
 	# number passed in to calc sqroot is in xmm0
 	# return floating-point number in xmm0
 	subq $8, %rsp
 
-	# xmm0: contains the return value
+	# xmm0: contains the return value & passed in value
 	# xmm1: contains a copy of what we are multiplying with
-	# xmm2: contains 1, used for incrementing xmm0
-	# xmm6: contains number passed in to calc sqroot
+	# xmm6: immutable value that contains sqroot input
 	# xmm7: previous-best
 	# xmm8: goal - previous-best
 	# xmm9: goal - current-best
 
-	movaps %xmm0, %xmm6
+	ucomisd zero(%rip), %xmm0
+	jp ret_nan
+	jz ret_0
+	jb ret_nan
 
-	movq $0, %rdx
-	cvtsi2sd %rdx, %xmm0 # xmm0 is now 0
-	cmp %rdx, %rdi # check if input is < 0, just return 0
-	jle end
-	incq %rdx
-	cvtsi2sd %rdx, %xmm1 # xmm1 is now 1
-	cvtsi2sd %rdx, %xmm2 # xmm2 is now 1
-	cvtsi2sd %rdi, %xmm6 # xmm6 is now the number we calculate sqroot for, but in floating-point
+	movsd %xmm0, %xmm6
+	
+	movsd zero(%rip), %xmm0 # xmm0 is now 0 
+	movsd %xmm0, %xmm1
+	addsd one(%rip), %xmm1 # xmm1 is now 1
 
 	while_loop:
 		# increment xmm0
-		addsd %xmm2, %xmm0
+		addsd one(%rip), %xmm0
 		
 		# save previous best
 		movaps %xmm1, %xmm7
@@ -71,7 +77,17 @@ sqroot:
 	
 	ucomisd %xmm8, %xmm9
 	jbe end
-	subsd %xmm2, %xmm0
+	subsd one(%rip), %xmm0
+
+	jmp end
+
+	ret_nan:
+		movsd neg_nan(%rip), %xmm0
+		jmp end
+
+	ret_0:
+		movsd zero(%rip), %xmm0
+		jmp end
 
 	end:
 	addq $8, %rsp
