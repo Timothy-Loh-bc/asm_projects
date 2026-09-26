@@ -1,7 +1,7 @@
 .section .rodata
 	array: .quad 1,4,9,16,25,36,49,64,81,100
 	number_of_elems: .quad 10
-	printf_string: .string "The square root of %d is %f\n"
+	printf_string: .string "The square root of %d is %lf\n"
 
 .section .text
 
@@ -23,25 +23,26 @@ main:
 	movq number_of_elems(%rip), %r9
 
 	for_loop_array:
-		# we use rsi for the number we are calculating for
-		movq (%r8,%rcx,8), %rsi
+		# we use rdi for the number we are calculating for
+		# preparing it for the first arg when calling sqroot (as per SystemV x86-64 convention)
+		movq (%r8,%rcx,8), %rdi
+		
 		incq %rcx
 
 		# calling sqroot here, return value in rax
 		pushq %r8
 		pushq %r9
 		pushq %rcx
-		pushq %rsi
+		pushq %rdi
 		call sqroot
-		popq %rsi
+		popq %rdi
 		popq %rcx
 		popq %r9
 		popq %r8
 		
 		# setup printf args
-		leaq printf_string(%rip), %rdi
-		# rsi already contains the number we are calculating for, assigned at the start
-		# of the for loop
+		movq %rdi, %rsi # move the number we want to calc sqroot to 2nd arg
+		leaq printf_string(%rip), %rdi # string to print is 1st arg
 		
 		# by SystemV ABI, floating-point values are returned via xmm registers
 		# therefore, we don't need to touch it, we assume the floating-point
