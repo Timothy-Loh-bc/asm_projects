@@ -24,8 +24,10 @@ main:
 
 	for_loop_array:
 		# we use rdi for the number we are calculating for
-		# preparing it for the first arg when calling sqroot (as per SystemV x86-64 convention)
+		# preparing it for the first arg when calling sqroot, therefore, moving it to xmm0 
+		# (as per SystemV x86-64 convention)
 		movq (%r8,%rcx,8), %rdi
+		cvtsi2sd %rdi, %xmm0		
 		
 		incq %rcx
 

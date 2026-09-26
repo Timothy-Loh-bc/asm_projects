@@ -9,7 +9,7 @@
 .global sqroot
 
 sqroot:
-	# number passed in to calc sqroot is in rdi
+	# number passed in to calc sqroot is in xmm0
 	# return floating-point number in xmm0
 	subq $8, %rsp
 
@@ -20,6 +20,8 @@ sqroot:
 	# xmm7: previous-best
 	# xmm8: goal - previous-best
 	# xmm9: goal - current-best
+
+	movaps %xmm0, %xmm6
 
 	movq $0, %rdx
 	cvtsi2sd %rdx, %xmm0 # xmm0 is now 0
