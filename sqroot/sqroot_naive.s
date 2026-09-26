@@ -23,8 +23,8 @@ sqroot:
 
 	movq $0, %rdx
 	cvtsi2sd %rdx, %xmm0 # xmm0 is now 0
-	testq %rdi, %rdi # check if input is 0, just return 0
-	jz end
+	cmp %rdx, %rdi # check if input is < 0, just return 0
+	jle end
 	incq %rdx
 	cvtsi2sd %rdx, %xmm1 # xmm1 is now 1
 	cvtsi2sd %rdx, %xmm2 # xmm2 is now 1

@@ -1,6 +1,6 @@
 .section .rodata
-	array: .quad 0,1,5,9,10,15,25,63,65,100,121
-	number_of_elems: .quad 11
+	array: .quad -2,0,1,5,9,10,15,25,63,65,100,121,144,145,146,147,155,200,222,2000,3000,4000,7000,10000,150000
+	number_of_elems: .quad 25
 	printf_string: .string "The square root of %d is %lf\n"
 
 .section .text
