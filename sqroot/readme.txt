@@ -3,9 +3,8 @@ https://medium.com/@dev.madhurendra/finding-square-roots-from-basic-iterations-t
 
 Using perf to time.
 
-All sqroot implementations take in two args
-	1. 4 byte unsigned integer, number of elements in the array
-	2. 8 byte pointer, address to a 4 byte unsigned integer.
+All sqroot implementations take in just one arg.
+	1. Value to square root in xmm0
 
 All sqroot implementations follow System V ABI.
 	e.g. Because they are called from main.s, 
